@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Amine's portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    /* خلفية gradient مستوحاة من Cha Hae-In */
+    background: linear-gradient(135deg, #23243a 0%, #3a2e5c 50%, #5b3fa9 100%);
+    font-family: 'Montserrat', Arial, sans-serif;
+    overflow: hidden;
+  }
+    #bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      background: transparent;
+      pointer-events: none;
+    }
+    .content {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+    }
+    .profile-card {
+      background: rgba(0,0,0,0.4);
+      border-radius: 20px;
+      padding: 52px 40px;
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
+      margin-bottom: 42px;
+      max-width: 600px;
+      width: 100%;
+      font-size: 1.30rem;
+    }
+    .profile-avatar {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      margin-bottom: 24px;
+      object-fit: cover;
+      box-shadow: 0 0 16px #fff4;
+    }
+    .profile-name {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      text-shadow: 0 0 8px #fff, 0 0 16px #0ff;
+    }
+    .profile-role {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: #0ff;
+      text-shadow: 0 0 8px #000;
+    }
+    .profile-bio {
+      font-size: 1rem;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="content">
+    <div class="profile-card">
+      <img src="11180f74f8516f8aca174c2118a2594e.jpg" alt="Profile" class="profile-avatar">
+      <h1 class="profile-name">Sayonaraaaa ღ (Mohamed Amine)💙</h1>
+      <p class="profile-role">Web Developer & Designer & Data Scientist & AI Engineer</p>
+      <p class="profile-bio">I'm Mohamed Amine, a 15-year-old self-taught developer with a deep passion for technology, design, and building things that actually work — not just look good.</p>
+    </div>
+    <!-- باقي sections الموقع هنا -->
+  </div>
+  <script>
+    // Neon interactive background (like rauno.me)
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+
+    const neonColors = [
+      '#39FF14', // Neon Green
+      '#00FFFF', // Neon Blue
+      '#FF00FF', // Neon Pink
+      '#FFFF00', // Neon Yellow
+      '#FF3131', // Neon Red
+      '#B026FF', // Neon Purple
+      '#FF6EC7'  // Neon Magenta
+    ];
+
+    // Particles
+    const particles = [];
+    const PARTICLE_COUNT = 60;
+
+    function randomNeonColor() {
+      return neonColors[Math.floor(Math.random() * neonColors.length)];
+    }
+
+    function createParticle(x, y) {
+      return {
+        x: x !== undefined ? x : Math.random() * w,
+        y: y !== undefined ? y : Math.random() * h,
+        radius: 1.5 + Math.random() * 2.5,
+        color: randomNeonColor(),
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: (Math.random() - 0.5) * 1.2
+      };
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(createParticle());
+    }
+
+    // Mouse interaction
+    let mouse = { x: w/2, y: h/2 };
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+
+      // Draw lines between close particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.save();
+            ctx.globalAlpha = 0.18;
+            ctx.strokeStyle = particles[i].color;
+            ctx.shadowColor = particles[i].color;
+            ctx.shadowBlur = 16;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+      }
+
+      // Draw particles
+      particles.forEach(p => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 18;
+        ctx.globalAlpha = 0.85;
+        ctx.fill();
+        ctx.restore();
+
+        // Move particles
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Bounce from edges
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    // Add particles on mouse click
+    canvas.addEventListener('click', e => {
+      for (let i = 0; i < 3; i++) {
+        particles.push(createParticle(e.clientX, e.clientY));
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+    });
+
+    draw();
+  </script>
+  <!-- ...existing code... -->
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<div class="icon-navbar">
+  <a href="#"><span><i class="fas fa-home"></i></span></a>
+  <a href="#"><span><i class="fas fa-paint-brush"></i></span></a>
+  <a href="#"><span><i class="fas fa-lightbulb"></i></span></a>
+  <a href="#"><span><i class="fas fa-camera"></i></span></a>
+  <a href="#"><span><i class="fab fa-twitter"></i></span></a>
+  <a href="#"><span><i class="fab fa-github"></i></span></a>
+  <a href="#"><span><i class="fas fa-envelope"></i></span></a>
+  <a href="#"><span><i class="fas fa-moon"></i></span></a>
+  <a href="#"><span><i class="fas fa-volume-up"></i></span></a>
+</div>
+<nav class="main-navbar">
+  <a href="index.html">Home</a>
+  <a href="projects.html">Projects</a>
+  <a href="skills.html">Skills</a>
+  <a href="certificates.html">Certificates</a>
+  <a href="testimonials.html">Testimonials</a>
+  <a href="blog.html">Blog</a>
+  <a href="timeline.html">Timeline</a>
+  <a href="contact.html">Contact</a>
+</nav>
+<style>
+.icon-navbar {
+  position: fixed;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  background: transparent;
+  border-radius: 40px;
+  box-shadow: 0 4px 24px #0002;
+  padding: 10px 18px;
+  display: flex;
+  gap: 18px;
+  z-index: 10;
+  backdrop-filter: blur(6px);
+}
+.icon-navbar a {
+  text-decoration: none;
+}
+.icon-navbar span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: transparent;
+  color: #000000;
+  font-size: 1.3rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px #0001;
+}
+.icon-navbar span:hover {
+  background: transparent;
+  color: #0078ff;
+  box-shadow: 0 4px 16px #0078ff33;
+}
+</style>
+<!-- ...existing code... -->
+</body>
+</html>
